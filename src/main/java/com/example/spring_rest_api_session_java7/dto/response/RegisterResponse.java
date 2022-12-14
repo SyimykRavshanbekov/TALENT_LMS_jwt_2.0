@@ -10,7 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RegisterResponse {
-
     private String id;
     private String email;
     private String firstName;

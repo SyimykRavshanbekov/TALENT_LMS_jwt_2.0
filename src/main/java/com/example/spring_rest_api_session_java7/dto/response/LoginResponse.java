@@ -12,7 +12,6 @@ import java.util.Set;
 @Getter
 @Setter
 public class LoginResponse {
-
     private String jwtToken;
     private String message;
     private Set<String> authorities;
