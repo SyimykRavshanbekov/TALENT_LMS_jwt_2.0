@@ -8,31 +8,31 @@ import com.example.spring_rest_api_session_java7.entities.User;
 import com.example.spring_rest_api_session_java7.repository.UserRepository;
 import com.example.spring_rest_api_session_java7.security.ValidationExceptionType;
 import com.example.spring_rest_api_session_java7.security.jwt.JwtTokenUtil;
-import com.example.spring_rest_api_session_java7.service.impl.UserService;
+import com.example.spring_rest_api_session_java7.service.impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * author: Ulansky
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/jwt/")
+@RequestMapping("/api/jwt")
 public class AuthApi {
-
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final JwtTokenUtil jwtTokenUtil;
     private final UserRepository userRepository;
     private final LoginConverter loginConverter;
 
-    @PostMapping("login")
+    @PostMapping("/login")
     public ResponseEntity<LoginResponse> getLogin(@RequestBody RegisterRequest request) {
         try {
             UsernamePasswordAuthenticationToken token =
@@ -51,8 +51,38 @@ public class AuthApi {
         }
     }
 
-    @PostMapping("registration")
+    @PostMapping("/registration")
     public RegisterResponse create(@RequestBody RegisterRequest request) {
         return userService.create(request);
     }
+
+    @GetMapping("/getAllUser")
+    @PreAuthorize("isAuthenticated()")
+    public List<RegisterResponse> getAllUser() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/getUserById/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public RegisterResponse getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+
+    @PutMapping("/updateUser/{id}")
+    @PreAuthorize("hasAuthority('Admin')")
+    public RegisterResponse updateUser(@PathVariable Long id, @RequestBody RegisterRequest registerRequest) {
+        return userService.updateUser(id, registerRequest);
+    }
+
+    @DeleteMapping("/deleteUser/{id}")
+    @PreAuthorize("hasAuthority('Admin')")
+    public RegisterResponse deleteUser(@PathVariable Long id) {
+        return userService.deleteUser(id);
+    }
+
+    @PostMapping("/changeRole/{roleId}/{userId}")
+    public RegisterResponse changeRole(@PathVariable Long roleId, @PathVariable Long userId) throws IOException {
+        return userService.changeRole(roleId, userId);
+    }
+
 }
