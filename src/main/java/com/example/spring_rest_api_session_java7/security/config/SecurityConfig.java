@@ -48,29 +48,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers("/api/jwt/**").permitAll()
-//                .antMatchers("/company/getAll").hasAnyAuthority("Admin", "Instructor", "Student")
-//                .antMatchers("/company/save").hasAuthority("Admin")
-//                .antMatchers("/company/update").hasAnyAuthority("Admin", "Instructor")
-//                .antMatchers("/company/delete").hasAuthority("Admin")
                 .anyRequest().authenticated().and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-
-//        http.authorizeRequests()
-//                .antMatchers("/getAllCompanies").hasAnyAuthority("Admin", "Instructor", "Student")
-//                .antMatchers("/addCompany").hasAuthority("Admin")
-//                .antMatchers("/updateCompany").hasAnyAuthority("Admin", "Instructor")
-//                .antMatchers("/deleteCompany").hasAuthority("Admin")
-//
-//
-//
-//                .anyRequest().authenticated()
-//                .and()
-//                .formLogin()
-//                .defaultSuccessUrl("/getAllCompanies")
-//                .permitAll()
-//                .and()
-//                .logout().permitAll();
     }
+
+
 }

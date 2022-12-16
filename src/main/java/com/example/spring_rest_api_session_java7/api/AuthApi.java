@@ -52,6 +52,7 @@ public class AuthApi {
     }
 
     @PostMapping("/registration")
+    @PreAuthorize("hasAuthority('Admin')")
     public RegisterResponse create(@RequestBody RegisterRequest request) {
         return userService.create(request);
     }
@@ -81,7 +82,8 @@ public class AuthApi {
     }
 
     @PostMapping("/changeRole/{roleId}/{userId}")
-    public RegisterResponse changeRole(@PathVariable Long roleId, @PathVariable Long userId) throws IOException {
+    @PreAuthorize("hasAuthority('Admin')")
+    public RegisterResponse changeRole(@PathVariable("roleId") Long roleId, @PathVariable("userId") Long userId) throws IOException {
         return userService.changeRole(roleId, userId);
     }
 

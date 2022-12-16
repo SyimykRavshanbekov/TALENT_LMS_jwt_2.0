@@ -14,7 +14,6 @@ import java.util.Set;
  */
 @Component
 public class LoginConverter {
-
     public LoginResponse loginView(String token,
                                    String message,
                                    User user){
