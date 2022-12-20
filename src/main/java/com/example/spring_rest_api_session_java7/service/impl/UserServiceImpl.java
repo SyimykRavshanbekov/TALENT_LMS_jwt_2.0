@@ -123,8 +123,14 @@ public class UserServiceImpl implements UserDetailsService {
         return mapToResponse(user);
     }
 
-    public RegisterResponse deleteUser(Long id){
+    public RegisterResponse deleteUser(Long id) throws IOException {
         User user = userRepository.findById(id).get();
+        for (Role role: user.getRoles()) {
+            if (role.getRoleName().equals("Admin")){
+                throw new IOException("You can't delete admin");
+            }
+
+        }
         userRepository.delete(user);
         return mapToResponse(user);
     }
