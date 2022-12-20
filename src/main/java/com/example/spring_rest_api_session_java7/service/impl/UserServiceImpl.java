@@ -118,6 +118,8 @@ public class UserServiceImpl implements UserDetailsService {
             user.setFirstName(userRequest.getFirstName());
         if (userRequest.getFirstName() != null)
             user.setPassword(userRequest.getPassword());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
         return mapToResponse(user);
     }
 
@@ -130,8 +132,14 @@ public class UserServiceImpl implements UserDetailsService {
     public RegisterResponse changeRole(Long roleId, Long userId) throws IOException {
         User user = userRepository.findById(userId).get();
         Role role = roleRepository.findById(roleId).get();
-        if (role.getRoleName().equalsIgnoreCase("admin")){
+        if (role.getRoleName().equals("Admin")){
             throw new IOException("only 1 user can be admin");
+        }
+
+        for (Role r: user.getRoles()) {
+           if (r.getRoleName().equals(role.getRoleName())){
+               throw new IOException("This user already have this role");
+           }
         }
 
         user.getRoles().add(role);
