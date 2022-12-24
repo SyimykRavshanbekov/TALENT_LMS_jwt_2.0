@@ -3,6 +3,7 @@ package com.example.spring_rest_api_session_java7.entities;
 import javax.persistence.*;
 
 import com.example.spring_rest_api_session_java7.enums.StudyFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -38,4 +39,8 @@ public class Student {
 
     @ManyToOne(cascade = {MERGE,DETACH, REFRESH}, fetch = FetchType.EAGER)
     private Group groups;
+
+    @JsonIgnore
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private User user;
 }

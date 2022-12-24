@@ -14,8 +14,8 @@ import java.util.List;
 @RequestMapping("/lesson")
 @RequiredArgsConstructor
 public class LessonController {
-    private final LessonService lessonService;
 
+    private final LessonService lessonService;
 
     @GetMapping("/getAllByCourseId/{courseId}")
     @PreAuthorize("isAuthenticated()")
@@ -25,7 +25,7 @@ public class LessonController {
 
     @PostMapping("/save/{id}")
     @PreAuthorize("hasAnyAuthority('Admin', 'Instructor')")
-    public LessonResponse saveLesson(@PathVariable Long id, @RequestBody LessonRequest lessonRequest) throws IOException {
+    public LessonResponse saveLesson(@PathVariable Long id, @RequestBody LessonRequest lessonRequest)  {
         return lessonService.addLesson(id, lessonRequest);
     }
 
@@ -43,7 +43,7 @@ public class LessonController {
 
     @PutMapping("/update/{id}")
     @PreAuthorize("hasAnyAuthority('Admin', 'Instructor')")
-    public LessonResponse updateResponse(@RequestBody LessonRequest lessonRequest, @PathVariable Long id) throws IOException {
+    public LessonResponse updateResponse(@RequestBody LessonRequest lessonRequest, @PathVariable Long id) {
         return lessonService.updateLesson(lessonRequest, id);
     }
 }

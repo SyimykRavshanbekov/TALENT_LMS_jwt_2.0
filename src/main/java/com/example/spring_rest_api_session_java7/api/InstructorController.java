@@ -36,6 +36,7 @@ public class InstructorController {
     }
 
     @GetMapping("/findById/{id}")
+    @PreAuthorize("isAuthenticated()")
     public InstructorResponse findById(@PathVariable Long id){
         return instructorService.getInstructorById(id);
     }

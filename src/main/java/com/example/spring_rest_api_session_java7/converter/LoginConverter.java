@@ -16,20 +16,19 @@ import java.util.Set;
 public class LoginConverter {
     public LoginResponse loginView(String token,
                                    String message,
-                                   User user){
-         var loginResponse = new LoginResponse();
-         if(user != null){
-             setAuthorite(loginResponse,user.getRoles());
-         }
-         loginResponse.setJwtToken(token);
-         loginResponse.setMessage(message);
-         return loginResponse;
-    }
-    private void setAuthorite(LoginResponse loginResponse, List<Role> roles){
-        Set<String> authorities = new HashSet<>();
-        for(Role role : roles){
-            authorities.add(role.getRoleName());
+                                   User user) {
+        var loginResponse = new LoginResponse();
+        if (user != null) {
+            setAuthorite(loginResponse, user.getRole());
         }
+        loginResponse.setJwtToken(token);
+        loginResponse.setMessage(message);
+        return loginResponse;
+    }
+
+    private void setAuthorite(LoginResponse loginResponse, Role role) {
+        Set<String> authorities = new HashSet<>();
+        authorities.add(role.getRoleName());
         loginResponse.setAuthorities(authorities);
     }
 }

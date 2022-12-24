@@ -20,9 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * author: Ulansky
- */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/jwt")
@@ -51,12 +48,6 @@ public class AuthApi {
         }
     }
 
-    @PostMapping("/registration")
-    @PreAuthorize("hasAuthority('Admin')")
-    public RegisterResponse create(@RequestBody RegisterRequest request) {
-        return userService.create(request);
-    }
-
     @GetMapping("/getAllUser")
     @PreAuthorize("isAuthenticated()")
     public List<RegisterResponse> getAllUser() {
@@ -71,20 +62,8 @@ public class AuthApi {
 
     @PutMapping("/updateUser/{id}")
     @PreAuthorize("hasAuthority('Admin')")
-    public RegisterResponse updateUser(@PathVariable Long id, @RequestBody RegisterRequest registerRequest) {
+    public RegisterResponse updateUser(@PathVariable Long id, @RequestBody RegisterRequest registerRequest) throws IOException {
         return userService.updateUser(id, registerRequest);
-    }
-
-    @DeleteMapping("/deleteUser/{id}")
-    @PreAuthorize("hasAuthority('Admin')")
-    public RegisterResponse deleteUser(@PathVariable Long id) {
-        return userService.deleteUser(id);
-    }
-
-    @PostMapping("/changeRole/{roleId}/{userId}")
-    @PreAuthorize("hasAuthority('Admin')")
-    public RegisterResponse changeRole(@PathVariable("roleId") Long roleId, @PathVariable("userId") Long userId) throws IOException {
-        return userService.changeRole(roleId, userId);
     }
 
 }

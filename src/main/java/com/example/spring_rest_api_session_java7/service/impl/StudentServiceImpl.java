@@ -5,14 +5,14 @@ import com.example.spring_rest_api_session_java7.converter.student.StudentReques
 import com.example.spring_rest_api_session_java7.converter.student.StudentResponseConverter;
 import com.example.spring_rest_api_session_java7.dto.student.StudentRequest;
 import com.example.spring_rest_api_session_java7.dto.student.StudentResponse;
-import com.example.spring_rest_api_session_java7.entities.Course;
-import com.example.spring_rest_api_session_java7.entities.Group;
-import com.example.spring_rest_api_session_java7.entities.Instructor;
-import com.example.spring_rest_api_session_java7.entities.Student;
+import com.example.spring_rest_api_session_java7.entities.*;
 import com.example.spring_rest_api_session_java7.repository.GroupRepository;
+import com.example.spring_rest_api_session_java7.repository.RoleRepository;
 import com.example.spring_rest_api_session_java7.repository.StudentRepository;
+import com.example.spring_rest_api_session_java7.repository.UserRepository;
 import com.example.spring_rest_api_session_java7.service.StudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -26,6 +26,9 @@ public class StudentServiceImpl implements StudentService {
     private final GroupRepository groupRepository;
     private final StudentRequestConverter studentRequestConverter;
     private final StudentResponseConverter studentResponseConverter;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
     @Override
     public List<StudentResponse> getAllListStudent() {
@@ -57,8 +60,18 @@ public class StudentServiceImpl implements StudentService {
             }
         }
 
-        studentRepository.save(student);
+        User user = new User();
+        Role role = roleRepository.findById(3L).get();
+        user.setPassword(passwordEncoder.encode(studentRequest.getPassword()));
+        user.setFirstName(studentRequest.getFirstName());
+        user.setEmail(studentRequest.getEmail());
+        user.setRole(role);
+        role.getUsers().add(user);
+        student.setUser(user);
 
+        studentRepository.save(student);
+        userRepository.save(user);
+        roleRepository.save(role);
         return studentResponseConverter.viewStudent(student);
     }
 
@@ -71,9 +84,19 @@ public class StudentServiceImpl implements StudentService {
     public StudentResponse updateStudent(StudentRequest studentRequest, Long id) throws IOException {
         validator(studentRequest.getPhoneNumber().replace(" ", ""), studentRequest.getFirstName().replace(" ", ""), studentRequest.getLastName().replace(" ", ""));
         Student student = studentRepository.getById(id);
+
+        User user = student.getUser();
+        if (studentRequest.getEmail() != null)
+            user.setEmail(studentRequest.getEmail());
+        if (studentRequest.getPassword() != null)
+            user.setFirstName(studentRequest.getFirstName());
+        if (studentRequest.getFirstName() != null)
+            user.setPassword(studentRequest.getPassword());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
         studentRequestConverter.updateStudent(student, studentRequest);
         studentRepository.save(student);
-
+        userRepository.save(user);
         return studentResponseConverter.viewStudent(student);
     }
 
@@ -87,6 +110,9 @@ public class StudentServiceImpl implements StudentService {
             }
         }
         student.setGroups(null);
+        Role role = student.getUser().getRole();
+        role.getUsers().remove(student.getUser());
+        userRepository.delete(student.getUser());
         studentRepository.delete(student);
         return studentResponseConverter.viewStudent(student);
     }
@@ -103,11 +129,13 @@ public class StudentServiceImpl implements StudentService {
                 }
             }
         }
+
         for (Course c: student.getGroups().getCourses()) {
             for (Instructor i: c.getInstructors()) {
                 i.minus();
             }
         }
+
         for (Course c: group.getCourses()) {
             for (Instructor i: c.getInstructors()) {
                 i.plus();

@@ -6,15 +6,12 @@ import com.example.spring_rest_api_session_java7.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-
 import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/company")
 @RequiredArgsConstructor
-
 public class CompanyController {
 
     private final CompanyService companyService;
@@ -48,6 +45,5 @@ public class CompanyController {
     public CompanyResponse updateCompany(@PathVariable Long id, @RequestBody CompanyRequest companyRequest) throws IOException {
         return companyService.updateCompany(id, companyRequest);
     }
-
 
 }

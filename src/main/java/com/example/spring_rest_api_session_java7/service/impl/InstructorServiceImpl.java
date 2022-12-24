@@ -4,14 +4,14 @@ import com.example.spring_rest_api_session_java7.converter.instructor.Instructor
 import com.example.spring_rest_api_session_java7.converter.instructor.InstructorResponseConverter;
 import com.example.spring_rest_api_session_java7.dto.instructor.InstructorRequest;
 import com.example.spring_rest_api_session_java7.dto.instructor.InstructorResponse;
-import com.example.spring_rest_api_session_java7.entities.Course;
-import com.example.spring_rest_api_session_java7.entities.Group;
-import com.example.spring_rest_api_session_java7.entities.Instructor;
-import com.example.spring_rest_api_session_java7.entities.Student;
+import com.example.spring_rest_api_session_java7.entities.*;
 import com.example.spring_rest_api_session_java7.repository.CourseRepository;
 import com.example.spring_rest_api_session_java7.repository.InstructorRepository;
+import com.example.spring_rest_api_session_java7.repository.RoleRepository;
+import com.example.spring_rest_api_session_java7.repository.UserRepository;
 import com.example.spring_rest_api_session_java7.service.InstructorService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -25,6 +25,9 @@ public class InstructorServiceImpl implements InstructorService {
     private final CourseRepository courseRepository;
     private final InstructorRequestConverter instructorRequestConverter;
     private final InstructorResponseConverter instructorResponseConverter;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
     @Override
     public List<InstructorResponse> getAllList() {
@@ -38,6 +41,20 @@ public class InstructorServiceImpl implements InstructorService {
 
     @Override
     public InstructorResponse addInstructor(Long id, InstructorRequest instructorRequest) throws IOException {
+        for (User user: userRepository.findAll()) {
+          if (user.getEmail().equals(instructorRequest.getEmail())){
+              throw new IOException("This instructor already exists!");
+          }
+        }
+
+        User user = new User();
+        Role role = roleRepository.findById(2L).get();
+        user.setPassword(passwordEncoder.encode(instructorRequest.getPassword()));
+        user.setFirstName(instructorRequest.getFirstName());
+        user.setEmail(instructorRequest.getEmail());
+        user.setRole(role);
+        role.getUsers().add(user);
+
         Instructor instructor = instructorRequestConverter.createInstructor(instructorRequest);
         Course course = courseRepository.getById(id);
         if (course.getGroups()!=null){
@@ -47,10 +64,15 @@ public class InstructorServiceImpl implements InstructorService {
                 }
             }
         }
+
+
         validator(instructorRequest.getPhoneNumber().replace(" ", ""), instructorRequest.getLastName().replace(" ", ""), instructorRequest.getFirstName().replace(" ", ""));
         course.addInstructors(instructor);
         instructor.setCourse(course);
+        instructor.setUser(user);
         instructorRepository.save(instructor);
+        userRepository.save(user);
+        roleRepository.save(role);
         return instructorResponseConverter.viewInstructor(instructor);
     }
 
@@ -65,13 +87,25 @@ public class InstructorServiceImpl implements InstructorService {
         validator(instructorRequest.getPhoneNumber().replace(" ", ""), instructorRequest.getLastName().replace(" ", ""), instructorRequest.getFirstName().replace(" ", ""));
         Instructor instructor = instructorRepository.getById(id);
         instructorRequestConverter.updateInstructor(instructor, instructorRequest);
+        User user = instructor.getUser();
+        if (instructorRequest.getEmail() != null)
+            user.setEmail(instructorRequest.getEmail());
+        if (instructorRequest.getPassword() != null)
+            user.setFirstName(instructorRequest.getFirstName());
+        if (instructorRequest.getFirstName() != null)
+            user.setPassword(instructorRequest.getPassword());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         instructorRepository.save(instructor);
+        userRepository.save(user);
         return instructorResponseConverter.viewInstructor(instructor);
     }
 
     @Override
     public InstructorResponse deleteInstructor(Long id) {
         Instructor instructor = instructorRepository.findById(id).get();
+        Role role = instructor.getUser().getRole();
+        role.getUsers().remove(instructor.getUser());
+        userRepository.delete(instructor.getUser());
         instructorRepository.delete(instructor);
         return instructorResponseConverter.viewInstructor(instructor);
     }

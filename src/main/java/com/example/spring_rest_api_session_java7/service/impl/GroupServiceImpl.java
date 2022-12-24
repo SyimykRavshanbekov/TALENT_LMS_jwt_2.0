@@ -28,7 +28,6 @@ public class GroupServiceImpl implements GroupService {
     private final GroupResponseConverter groupResponseConverter;
     private final GroupRequestConverter groupRequestConverter;
 
-
     @Override
     public List<GroupResponse> getAllGroup(Long id) {
         return groupResponseConverter.view(groupRepository.getAllGroup(id)) ;
@@ -36,7 +35,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<GroupResponse> getAllGroupsByCourseId(Long courseId) {
-        return  groupResponseConverter.view(courseRepository.getReferenceById(courseId).getGroups());
+        return  groupResponseConverter.view(courseRepository.getById(courseId).getGroups());
     }
 
     @Override

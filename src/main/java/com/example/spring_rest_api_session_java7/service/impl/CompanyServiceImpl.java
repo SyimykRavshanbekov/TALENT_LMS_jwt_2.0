@@ -82,6 +82,4 @@ public class CompanyServiceImpl implements CompanyService {
             throw new IOException("В название компании или страны должно быть как минимум 3 буквы");
         }
     }
-
-
 }

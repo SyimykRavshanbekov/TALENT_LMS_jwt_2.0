@@ -15,6 +15,7 @@ import java.util.List;
 @RequestMapping("/task")
 @RequiredArgsConstructor
 public class TaskController {
+
     private final TaskService taskService;
 
     @GetMapping("/getAllByLessonId/{lessonId}")
@@ -25,7 +26,7 @@ public class TaskController {
 
     @PostMapping("/save/{id}")
     @PreAuthorize("hasAnyAuthority('Admin', 'Instructor')")
-    public TaskResponse saveTask(@PathVariable Long id, @RequestBody TaskRequest taskRequest) throws IOException {
+    public TaskResponse saveTask(@PathVariable Long id, @RequestBody TaskRequest taskRequest) {
         return taskService.addTask(id, taskRequest);
     }
 
@@ -43,7 +44,7 @@ public class TaskController {
 
     @PutMapping("/update/{id}")
     @PreAuthorize("hasAnyAuthority('Admin', 'Instructor')")
-    public TaskResponse updateTask(@RequestBody TaskRequest taskRequest, @PathVariable Long id) throws IOException {
+    public TaskResponse updateTask(@RequestBody TaskRequest taskRequest, @PathVariable Long id) {
         return taskService.updateTask(taskRequest, id);
     }
 }

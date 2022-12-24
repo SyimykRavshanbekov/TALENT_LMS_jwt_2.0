@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static javax.persistence.CascadeType.*;
+
 /**
  * author: Ulansky
  */
@@ -31,18 +33,22 @@ public class User implements UserDetails{
     private String password;
     private String firstName;
 
-    @ManyToMany(targetEntity = Role.class, cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinTable(name = "users_roles",
-            joinColumns = {@JoinColumn(name = "users_id")},
-            inverseJoinColumns = {@JoinColumn(name = "roles_id")})
-    private List<Role> roles;
+    @ManyToOne(cascade = {PERSIST, MERGE, REFRESH, DETACH})
+    @JoinColumn(name = "role_id")
+    private Role role;
+
+//    @ManyToOne(targetEntity = Role.class, cascade = {MERGE, PERSIST, PERSIST, DETACH},fetch = FetchType.EAGER)
+//    @JoinTable(name = "users_roles",
+//            joinColumns = {@JoinColumn(name = "users_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "roles_id")})
+//    private List<Role> roles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
-        for(Role role : roles){
+//        for(Role role : roles){
             grantedAuthorities.add(new SimpleGrantedAuthority(role.getRoleName()));
-        }
+//        }
         return grantedAuthorities;
     }
 

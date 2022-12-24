@@ -1,6 +1,8 @@
 package com.example.spring_rest_api_session_java7.entities;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,6 +37,7 @@ public class Instructor {
     private String specialization;
 
     private int students = 0;
+
     public void plus(){
         students++;
     }
@@ -42,6 +45,10 @@ public class Instructor {
     public void minus(){
         students--;
     }
+
+    @JsonIgnore
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private User user;
 
     @ManyToOne(cascade = {MERGE, DETACH, REFRESH}, fetch = FetchType.EAGER)
     private Course course;
